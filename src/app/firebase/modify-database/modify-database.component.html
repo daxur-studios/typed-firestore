@@ -1,0 +1,180 @@
+<form style="min-height: 60vh; padding-top: 8px" [formGroup]="group">
+  <div
+    class="collection-id"
+    *ngIf="node?.ref?.type !== 'document'"
+    style="display: flex"
+  >
+    <mat-form-field style="flex: 1 1">
+      <mat-label>Collection ID</mat-label>
+      <input
+        matInput
+        type="search"
+        [formControl]="group.controls.collectionId"
+      />
+    </mat-form-field>
+  </div>
+
+  <div class="parent-path">
+    <h4 style="opacity: 0.5">
+      Parent path
+      <small>
+        {{ node?.ref?.path }}
+      </small>
+    </h4>
+  </div>
+
+  <div class="document-id" style="display: flex">
+    <mat-form-field style="flex: 1 1">
+      <mat-label>Document ID</mat-label>
+      <input matInput type="search" [formControl]="group.controls.documentId" />
+    </mat-form-field>
+  </div>
+
+  <div style="padding-top: 8px">
+    <!--Form Array-->
+    <div formArrayName="fields">
+      <div
+        *ngFor="let field of group.controls.fields.controls; let i = index"
+        [formGroupName]="i"
+        style="display: flex; align-items: center; gap: 2px"
+      >
+        <!--Field-->
+        <mat-form-field>
+          <mat-label>Field</mat-label>
+          <input matInput formControlName="field" />
+        </mat-form-field>
+        <div class="equals">
+          =
+          <div style="height: 22px; width: 1px"></div>
+        </div>
+        <!--Type-->
+
+        <mat-form-field>
+          <mat-label>Type</mat-label>
+          <mat-select formControlName="type">
+            <mat-select-trigger>
+              <span [class]="field.controls.type.value">
+                {{ field.controls.type.value }}
+              </span>
+            </mat-select-trigger>
+
+            <mat-option value="string" class="string">string</mat-option>
+            <mat-option value="number" class="number">number</mat-option>
+            <mat-option value="boolean" class="boolean">boolean</mat-option>
+            <mat-option value="map" class="map">map</mat-option>
+            <mat-option value="array" class="array">array</mat-option>
+            <mat-option value="null" class="null">null</mat-option>
+            <mat-option value="timestamp" class="timestamp"
+              >timestamp</mat-option
+            >
+            <mat-option value="geopoint" class="geopoint">geopoint</mat-option>
+            <mat-option value="reference" class="reference"
+              >reference</mat-option
+            >
+          </mat-select>
+        </mat-form-field>
+        <!--Value-->
+
+        <!--NG Switch Based on Type-->
+        <ng-container [ngSwitch]="field.controls.type.value">
+          <!--String-->
+          <div *ngSwitchCase="'string'">
+            <mat-form-field>
+              <mat-label>Value</mat-label>
+              <input matInput type="search" formControlName="value" />
+            </mat-form-field>
+          </div>
+          <!--Number-->
+          <div *ngSwitchCase="'number'">
+            <mat-form-field>
+              <mat-label>Value</mat-label>
+              <input matInput type="number" formControlName="value" />
+            </mat-form-field>
+          </div>
+          <!--Boolean-->
+          <div *ngSwitchCase="'boolean'">
+            <mat-form-field>
+              <mat-label>Value</mat-label>
+              <mat-select formControlName="value">
+                <mat-option value="true">true</mat-option>
+                <mat-option value="false">false</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <!--Map-->
+          <div *ngSwitchCase="'map'">
+            <mat-form-field>
+              <mat-label>Value</mat-label>
+              <input matInput formControlName="value" />
+            </mat-form-field>
+          </div>
+          <!--Array-->
+          <div *ngSwitchCase="'array'">
+            <mat-form-field>
+              <mat-label>Value</mat-label>
+              <input matInput formControlName="value" />
+            </mat-form-field>
+          </div>
+          <!--Null-->
+          <div *ngSwitchCase="'null'">
+            <div class="null">null</div>
+          </div>
+          <!--Timestamp-->
+          <div *ngSwitchCase="'timestamp'">
+            <mat-form-field>
+              <mat-label>Value</mat-label>
+              <input matInput type="datetime-local" formControlName="value" />
+            </mat-form-field>
+          </div>
+          <!--Geopoint-->
+          <div *ngSwitchCase="'geopoint'">
+            <mat-form-field>
+              <mat-label>Value</mat-label>
+              <input matInput formControlName="value" />
+            </mat-form-field>
+          </div>
+          <!--Reference-->
+          <div *ngSwitchCase="'reference'">
+            <mat-form-field>
+              <mat-label>Value</mat-label>
+              <input matInput formControlName="value" />
+            </mat-form-field>
+          </div>
+        </ng-container>
+
+        <button
+          mat-icon-button
+          (click)="removeField(i)"
+          color="accent"
+          style="margin-bottom: 22px"
+        >
+          <mat-icon>remove_circle_outline</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <button mat-button (click)="addField()">
+      <mat-icon>add_circle_outline</mat-icon>
+      Add Field
+    </button>
+  </div>
+
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="save()"
+    style="float: right; align-self: flex-end; margin-right: 8px"
+    [disabled]="group.invalid"
+    type="button"
+  >
+    Save
+  </button>
+  <button
+    mat-button
+    (click)="close()"
+    style="float: right; align-self: flex-end"
+    type="button"
+  >
+    Cancel
+  </button>
+</form>

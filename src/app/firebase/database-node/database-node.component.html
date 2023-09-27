@@ -1,0 +1,61 @@
+<div style="flex: 1 1" class="node-segment">
+  <div class="header">
+    <!--ROOT-->
+    <ng-container *ngIf="isRoot">
+      <mat-icon svgIcon="firestore" matTooltip="Root"></mat-icon> Root
+    </ng-container>
+
+    <!--DOCUMENT-->
+    <ng-container *ngIf="isDocument">
+      <mat-icon matTooltip="Document"> description </mat-icon>
+      {{ node?.ref?.id }}
+    </ng-container>
+
+    <!--COLLECTION-->
+    <ng-container *ngIf="isCollection">
+      <mat-icon matTooltip="Collection">category</mat-icon>
+      {{ node?.ref?.id }}
+    </ng-container>
+  </div>
+
+  <!--Node Children (Documents or Collections)-->
+  <div class="children">
+    <div class="add">
+      <button
+        mat-button
+        (click)="modifyDatabase(node?.ref?.type || 'collection')"
+        color="primary"
+      >
+        <mat-icon>add</mat-icon>
+        {{ isDocument || isRoot ? "Start Collection" : "Add Document" }}
+      </button>
+    </div>
+
+    <mat-list>
+      <ng-container *ngFor="let collection of node?.children">
+        <mat-list-item (click)="goTo(collection)">
+          <h4 matListItemTitle>{{ collection.id }}</h4>
+        </mat-list-item>
+        <mat-divider></mat-divider>
+      </ng-container>
+    </mat-list>
+  </div>
+
+  <div class="add-field" *ngIf="isDocument && !isRoot">
+    <button mat-button (click)="modifyDatabase('field')" color="primary">
+      <mat-icon>add</mat-icon> Add Field
+    </button>
+  </div>
+
+  <app-document-node *ngIf="isDocument && !isRoot"></app-document-node>
+</div>
+
+<!--Add Collection/Document/Fields-->
+<ng-template #modifyDatabaseTemplate>
+  <h3 *ngIf="modificationType !== 'field'">
+    <ng-container *ngIf="isDocument">Start a collection</ng-container>
+    <ng-container *ngIf="isCollection">Add a document</ng-container>
+  </h3>
+
+  <app-modify-database [node]="node" [ref]="ref" />
+</ng-template>

@@ -1,0 +1,37 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      // Allow access by all users vs by admins only (+isAdmin())
+      allow read : if isSignedIn() && isAdmin();
+      allow write: if isSignedIn() && isAdmin() && LESS_THAN_N_MEGABYTES(1000);
+    }
+    
+    match /public/{any=**} {
+    	allow read:if true;
+    	allow write:if false;
+      
+    }
+    match /private/user/{user_id}/{user_doc=**} {
+      allow read: if isOwner(user_id);
+      allow write: if isOwner(user_id) && LESS_THAN_N_MEGABYTES(1000);
+    }
+    
+  }
+  
+}
+
+function LESS_THAN_N_MEGABYTES(n){
+return request.resource == null || request.resource.size < n*1024*1024 ;
+}
+
+function isAdmin(){
+return request.auth != null && request.auth.token.isAdmin == true;
+}
+
+function isSignedIn(){
+return request.auth!=null;// && request.auth.token.firebase.sign_in_provider == 'google'
+}
+function isOwner(userId){
+return request.auth != null && request.auth.uid==userId;
+}

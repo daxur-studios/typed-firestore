@@ -1,0 +1,36 @@
+.equals {
+  font-size: 1.8rem;
+  padding: 0.5ch;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.string {
+  color: #ff9800;
+}
+.number {
+  color: #00bcd4;
+}
+.boolean {
+  color: #2196f3;
+}
+.map {
+  color: #9c27b0;
+}
+.array {
+  color: #f44336;
+}
+.null {
+  color: #607d8b;
+}
+.timestamp {
+  color: #4caf50;
+}
+.geopoint {
+  color: #ff5722;
+}
+.reference {
+  color: #795548;
+}

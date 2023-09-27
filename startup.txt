@@ -1,0 +1,47 @@
+https://medium.com/firebase-developers/organize-cloud-functions-for-max-cold-start-performance-and-readability-with-typescript-and-9261ee8450f0
+
+https://github.com/CodingDoug/min-functions-cold-start/blob/master/functions/src/index.ts
+https://github.com/CodingDoug/min-functions-cold-start/blob/master/functions/src/fn/firestoreOnWriteFn.ts
+
+
+STARTUP**********************************************************************************
+
+
+ng s --configuration development
+
+
+firebase emulators:start --import emulator
+
+
+cd functions
+tsc -watch
+
+
+EXPORT**********************************************************************************
+
+
+firebase emulators:export emulator
+
+
+DEPLOY*****************
+
+
+npm run dax_build
+OR
+npm run dax_build_dev
+
+
+firebase deploy --only functions
+
+
+FIX EMULATOR PORT TAKEN/**********/************/************/************/************/************/************/************/************FIX EMULATOR PORT TAKEN
+
+netstat -ano | findstr :8080
+taskkill /PID <PID> /F
+
+OR NEW METHOD?
+
+npx kill-port --port 8080
+
+
+{"isAdmin":true}

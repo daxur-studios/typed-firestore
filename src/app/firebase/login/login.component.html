@@ -1,0 +1,21 @@
+<h2 *ngIf="firebaseService.user$ | async as user">
+  {{ user.displayName }}
+  <br />
+  <span style="font-size: 0.8rm; opacity: 0.5">{{ user.email }}</span>
+</h2>
+
+<h2 *ngIf="!(firebaseService.user$ | async)">Not signed in</h2>
+
+<ng-container *ngIf="firebaseService.user$ | async">
+  <!--Sign Out-->
+  <button mat-raised-button (click)="signOut()" color="warn">Sign Out</button>
+</ng-container>
+
+<ng-container *ngIf="!(firebaseService.user$ | async)">
+  <!--Sign In Anonymously-->
+  <!--Sign In With Google-->
+  <button mat-raised-button (click)="signInWithGoogle()" color="primary">
+    Sign In With Google
+  </button>
+  <!--Sign In with Microsoft-->
+</ng-container>

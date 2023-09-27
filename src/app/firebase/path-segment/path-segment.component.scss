@@ -1,0 +1,12 @@
+:host {
+  display: contents;
+}
+.path-segment {
+  display: inline-flex;
+  color: #ff9800;
+  cursor: pointer;
+}
+
+.path-segment:hover {
+  text-decoration: underline;
+}

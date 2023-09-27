@@ -1,0 +1,18 @@
+<p>database works!</p>
+
+<div class="database-page">
+  <p>
+    Database
+    <button mat-icon-button (click)="openLoginSheet()">
+      <mat-icon>login</mat-icon>
+    </button>
+  </p>
+
+  <app-path></app-path>
+  <div style="display: flex">
+    <app-database-node
+      *ngFor="let node of nodes"
+      [node]="node"
+    ></app-database-node>
+  </div>
+</div>

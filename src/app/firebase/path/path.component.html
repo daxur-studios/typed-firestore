@@ -1,0 +1,28 @@
+<!--Path-->
+<span class="project-id">
+  {{ databaseService.config.projectId }}
+</span>
+
+<button mat-icon-button (click)="databaseService.path$.next('')">
+  <mat-icon>home</mat-icon>
+</button>
+
+<div
+  *ngIf="!group.controls.path.enabled"
+  class="path-segments"
+  style="display: inline-flex"
+>
+  <app-path-segment *ngFor="let ref of refs" [ref]="ref"></app-path-segment>
+</div>
+
+<input
+  *ngIf="group.controls.path.enabled"
+  type="text"
+  [formControl]="group.controls.path"
+  (keypress)="onKeyPress($event, pathInput)"
+  #pathInput
+/>
+
+<button mat-icon-button (click)="editPath()">
+  <mat-icon>edit</mat-icon>
+</button>

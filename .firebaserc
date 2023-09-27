@@ -1,0 +1,14 @@
+{
+  "targets": {
+    "bruno-kertesz": {
+      "hosting": {
+        "bruno-kertesz": [
+          "bruno-kertesz"
+        ]
+      }
+    }
+  },
+  "projects": {
+    "default": "bruno-kertesz"
+  }
+}
