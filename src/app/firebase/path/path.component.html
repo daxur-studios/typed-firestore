@@ -1,9 +1,13 @@
 <!--Path-->
-<span class="project-id">
+<span class="project-id" *ngIf="!group.controls.path.enabled">
   {{ databaseService.config.projectId }}
 </span>
 
-<button mat-icon-button (click)="databaseService.path$.next('')">
+<button
+  mat-icon-button
+  (click)="databaseService.path$.next('')"
+  *ngIf="!group.controls.path.enabled"
+>
   <mat-icon>home</mat-icon>
 </button>
 
@@ -15,13 +19,16 @@
   <app-path-segment *ngFor="let ref of refs" [ref]="ref"></app-path-segment>
 </div>
 
-<input
-  *ngIf="group.controls.path.enabled"
-  type="text"
-  [formControl]="group.controls.path"
-  (keypress)="onKeyPress($event, pathInput)"
-  #pathInput
-/>
+<mat-form-field *ngIf="group.controls.path.enabled" style="flex: 1 1">
+  <input
+    type="text"
+    matInput
+    [formControl]="group.controls.path"
+    (keypress)="onKeyPress($event, pathInput)"
+    type="search"
+    #pathInput
+  />
+</mat-form-field>
 
 <button mat-icon-button (click)="editPath()">
   <mat-icon>edit</mat-icon>

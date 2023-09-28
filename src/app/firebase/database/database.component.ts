@@ -38,11 +38,19 @@ export class DatabaseComponent {
   private readonly destroy$ = new Subject<void>();
 
   public get nodes(): DatabaseNode[] {
-    const path = this.databaseService.path$.value;
+    const nodes: DatabaseNode[] = [];
 
-    const x: DatabaseNode | undefined = this.databaseService.database[path];
+    const currentPath = this.databaseService.path$.value;
+
+    const x: DatabaseNode | undefined =
+      this.databaseService.database[currentPath];
+    const y: DatabaseNode | undefined =
+      this.databaseService.database?.[x?.ref?.parent?.path!];
+    const z: DatabaseNode | undefined =
+      this.databaseService.database?.[y?.ref?.parent?.path!];
+
     if (x) {
-      return [x];
+      return [z, y, x].filter((n) => !!n);
     }
 
     return [];

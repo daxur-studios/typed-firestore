@@ -15,7 +15,9 @@ export class DatabaseService {
   public readonly config: IFirebaseConfig = environment.firebase;
 
   /** The Firestore Path, can be either a document path or a collection path */
-  public readonly path$ = new BehaviorSubject<string>('');
+  public readonly path$ = new BehaviorSubject<string>(
+    localStorage.getItem(`${environment.firebase.projectId}.path`) || ''
+  );
 
   public readonly database: {
     [path: string]: DatabaseNode;
@@ -26,14 +28,17 @@ export class DatabaseService {
       if (!user) {
         return;
       }
-      this.path$.next(`private/user/${user.uid}`);
+
+      if (!this.path$.value) {
+        this.path$.next(`private/user/${user.uid}`);
+      }
 
       // Get root collections
       //this.listCollections('');
 
       this.path$
         .pipe(
-          distinctUntilChanged(),
+          // distinctUntilChanged(),
           switchMap(async (rawPath) => {
             const validation =
               this.firebaseService.validReferenceFromPath(rawPath);
@@ -48,6 +53,11 @@ export class DatabaseService {
             } else {
               this.listDocuments(validation.validatedPath);
             }
+
+            localStorage.setItem(
+              `${environment.firebase.projectId}.path`,
+              validation.validatedPath
+            );
 
             return;
 
@@ -108,13 +118,13 @@ export class DatabaseService {
       string[]
     >('listCollections', { path: validated.validatedPath });
 
-    this.database[validated.validatedPath] = {
+    this.database[validated.validatedPath] = new DatabaseNode({
       children:
         listCollections.data.map((path) =>
           this.firebaseService.firestoreCollection(path)
         ) || [],
-      ref: validated.ref!,
-    };
+      ref: validated.ref,
+    });
 
     console.debug('this.database', this.database);
 
@@ -132,10 +142,10 @@ export class DatabaseService {
       [limit(10)]
     );
 
-    this.database[validation.validatedPath] = {
+    this.database[validation.validatedPath] = new DatabaseNode({
       children: listDocuments.docs.map((doc) => doc.ref),
-      ref: validation.ref!,
-    };
+      ref: validation.ref,
+    });
 
     console.debug('this.database', this.database);
 
@@ -143,10 +153,26 @@ export class DatabaseService {
   }
 }
 
-export type DatabaseNode = {
+export class DatabaseNode {
   children: (CollectionReference | DocumentReference)[];
   ref: CollectionReference | DocumentReference | undefined;
-};
+
+  public get isCollection(): boolean {
+    return this?.ref?.type === 'collection';
+  }
+  public get isDocument(): boolean {
+    return this?.ref?.type === 'document';
+  }
+
+  public get isRoot(): boolean {
+    return !this?.ref || this?.ref?.path === '';
+  }
+
+  constructor(node: Partial<DatabaseNode>) {
+    this.children = node.children || [];
+    this.ref = node.ref;
+  }
+}
 
 // export type BaseNode = {
 //   ref: CollectionReference | DocumentReference;

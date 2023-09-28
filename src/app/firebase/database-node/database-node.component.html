@@ -16,6 +16,20 @@
       <mat-icon matTooltip="Collection">category</mat-icon>
       {{ node?.ref?.id }}
     </ng-container>
+
+    <div style="float: right; align-self: end">
+      <button mat-icon-button [matMenuTriggerFor]="menu">
+        <mat-icon>more_vert</mat-icon>
+      </button>
+    </div>
+
+    <!--Menu-->
+    <mat-menu #menu="matMenu">
+      <button mat-menu-item color="warn" (click)="deleteCollection()">
+        <mat-icon>delete</mat-icon>
+        <span>Delete Collection</span>
+      </button>
+    </mat-menu>
   </div>
 
   <!--Node Children (Documents or Collections)-->
@@ -23,7 +37,9 @@
     <div class="add">
       <button
         mat-button
-        (click)="modifyDatabase(node?.ref?.type || 'collection')"
+        (click)="
+          modifyDatabase(isDocument || isRoot ? 'addCollection' : 'addDocument')
+        "
         color="primary"
       >
         <mat-icon>add</mat-icon>
@@ -32,30 +48,39 @@
     </div>
 
     <mat-list>
-      <ng-container *ngFor="let collection of node?.children">
-        <mat-list-item (click)="goTo(collection)">
-          <h4 matListItemTitle>{{ collection.id }}</h4>
-        </mat-list-item>
+      <ng-container *ngFor="let child of node?.children">
+        <mat-selection-list [multiple]="false" (click)="goTo(child)">
+          <mat-list-option
+            checkboxPosition="before"
+            [value]="child.path"
+            [selected]="matchesCurrentPath(child.path)"
+          >
+            {{ child.id }}
+          </mat-list-option>
+        </mat-selection-list>
         <mat-divider></mat-divider>
       </ng-container>
     </mat-list>
   </div>
 
   <div class="add-field" *ngIf="isDocument && !isRoot">
-    <button mat-button (click)="modifyDatabase('field')" color="primary">
+    <button mat-button (click)="modifyDatabase('addFields')" color="primary">
       <mat-icon>add</mat-icon> Add Field
     </button>
   </div>
 
-  <app-document-node *ngIf="isDocument && !isRoot"></app-document-node>
+  <app-document-node
+    *ngIf="isDocument && !isRoot"
+    [node]="node"
+  ></app-document-node>
 </div>
 
 <!--Add Collection/Document/Fields-->
 <ng-template #modifyDatabaseTemplate>
-  <h3 *ngIf="modificationType !== 'field'">
+  <h3 *ngIf="intent !== 'addFields'">
     <ng-container *ngIf="isDocument">Start a collection</ng-container>
     <ng-container *ngIf="isCollection">Add a document</ng-container>
   </h3>
 
-  <app-modify-database [node]="node" [ref]="ref" />
+  <app-modify-database [node]="node" [ref]="ref" [intent]="intent" />
 </ng-template>

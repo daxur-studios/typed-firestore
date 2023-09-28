@@ -1,5 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  Input,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { IFirebaseConfig } from '../database.model';
 import { DatabaseService } from '../database.service';
@@ -20,6 +27,8 @@ import {
   CollectionReference,
   DocumentReference,
 } from '@angular/fire/firestore';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
 
 @Component({
   selector: 'app-path',
@@ -29,6 +38,8 @@ import {
     MatIconModule,
     MatButtonModule,
     FormsModule,
+    MatFormFieldModule,
+    MatInputModule,
     ReactiveFormsModule,
     PathSegmentComponent,
   ],
@@ -36,6 +47,9 @@ import {
   styleUrls: ['./path.component.scss'],
 })
 export class PathComponent implements OnInit, OnDestroy {
+  @ViewChild('pathInput', { static: false })
+  pathInput?: ElementRef<HTMLInputElement>;
+
   public readonly group = new FormGroup(
     {
       path: new FormControl(this.databaseService.path$.value, {
@@ -104,7 +118,20 @@ export class PathComponent implements OnInit, OnDestroy {
   }
 
   editPath() {
-    this.group.controls.path.enable({ emitEvent: false });
+    if (this.group.controls.path.disabled) {
+      this.group.controls.path.enable({ emitEvent: false });
+
+      setTimeout(() => {
+        this.pathInput?.nativeElement?.focus();
+        // select all text
+        this.pathInput?.nativeElement?.setSelectionRange(
+          0,
+          this.pathInput?.nativeElement.value.length
+        );
+      }, 50);
+    } else {
+      this.group.controls.path.disable({ emitEvent: false });
+    }
   }
 }
 

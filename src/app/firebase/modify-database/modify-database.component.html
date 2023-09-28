@@ -1,29 +1,31 @@
 <form style="min-height: 60vh; padding-top: 8px" [formGroup]="group">
-  <div
-    class="collection-id"
-    *ngIf="node?.ref?.type !== 'document'"
-    style="display: flex"
-  >
-    <mat-form-field style="flex: 1 1">
-      <mat-label>Collection ID</mat-label>
-      <input
-        matInput
-        type="search"
-        [formControl]="group.controls.collectionId"
-      />
-    </mat-form-field>
-  </div>
+  <ng-container *ngIf="intent !== 'addFields'">
+    <div
+      class="collection-id"
+      *ngIf="node?.isRoot || node?.isDocument"
+      style="display: flex"
+    >
+      <mat-form-field style="flex: 1 1">
+        <mat-label>Collection ID</mat-label>
+        <input
+          matInput
+          type="search"
+          [formControl]="group.controls.collectionId"
+        />
+      </mat-form-field>
+    </div>
 
-  <div class="parent-path">
-    <h4 style="opacity: 0.5">
-      Parent path
-      <small>
-        {{ node?.ref?.path }}
-      </small>
-    </h4>
-  </div>
+    <div class="parent-path">
+      <h4 style="opacity: 0.5">
+        Parent path
+        <small>
+          {{ node?.ref?.path }}
+        </small>
+      </h4>
+    </div>
+  </ng-container>
 
-  <div class="document-id" style="display: flex">
+  <div class="document-id" style="display: flex" *ngIf="intent !== 'addFields'">
     <mat-form-field style="flex: 1 1">
       <mat-label>Document ID</mat-label>
       <input matInput type="search" [formControl]="group.controls.documentId" />

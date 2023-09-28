@@ -29,6 +29,7 @@ import { DatabaseNode, DatabaseService } from '../database.service';
 import { DatabaseFieldTypeOptions } from '../database.model';
 import { DocumentNodeComponent } from '../document-node/document-node.component';
 import { ModifyDatabaseComponent } from '../modify-database/modify-database.component';
+import { MatMenuModule } from '@angular/material/menu';
 
 @Component({
   selector: 'app-database-node',
@@ -43,6 +44,7 @@ import { ModifyDatabaseComponent } from '../modify-database/modify-database.comp
     MatDividerModule,
     MatTooltipModule,
     DocumentNodeComponent,
+    MatMenuModule,
   ],
   templateUrl: './database-node.component.html',
   styleUrls: ['./database-node.component.scss'],
@@ -66,7 +68,7 @@ export class DatabaseNodeComponent implements OnInit, OnDestroy {
     return !this.node?.ref || this.node?.ref?.path === '';
   }
 
-  modificationType: 'collection' | 'document' | 'field' | undefined;
+  intent: 'addCollection' | 'addDocument' | 'addFields' | undefined;
 
   constructor(
     private readonly matIconRegistry: MatIconRegistry,
@@ -101,8 +103,10 @@ export class DatabaseNodeComponent implements OnInit, OnDestroy {
     ref.afterDismissed().subscribe((result) => {});
   }
 
-  public modifyDatabase(type: 'collection' | 'document' | 'field'): void {
-    this.modificationType = type;
+  public modifyDatabase(
+    intent: 'addCollection' | 'addDocument' | 'addFields'
+  ): void {
+    this.intent = intent;
 
     const ref = this.matBottomSheet.open<
       ModifyDatabaseComponent,
@@ -113,9 +117,19 @@ export class DatabaseNodeComponent implements OnInit, OnDestroy {
 
     ref.afterDismissed().subscribe(async (result) => {
       if (result) {
-        result.collectionId;
-        result.documentId;
-        const path = `${result.collectionId}/${result.documentId}`;
+        const currentPath = this.node?.ref?.path || '';
+
+        const path =
+          // Add fields
+          intent === 'addFields'
+            ? `${currentPath}`
+            : // Add document
+            intent === 'addDocument'
+            ? `${currentPath}/${result.documentId}`
+            : // Add collection
+            intent === 'addCollection'
+            ? `${currentPath}/${result.collectionId}/${result.documentId}`
+            : '';
 
         const data: { [key: string]: any } = {};
         result.fields?.forEach((field) => {
@@ -125,13 +139,41 @@ export class DatabaseNodeComponent implements OnInit, OnDestroy {
         });
 
         await this.firebaseService.firestoreDocSet(path, data, {
-          merge: false,
+          merge: true,
         });
+
+        if (intent !== 'addFields') {
+          this.databaseService.path$.next(path);
+        }
       }
     });
   }
 
   goTo(ref: CollectionReference | DocumentReference): void {
     this.databaseService.path$.next(ref.path);
+  }
+
+  async deleteCollection() {
+    if (this.node?.ref?.type !== 'collection' || !this.node?.ref?.path) {
+      throw new Error('Can only delete a collection');
+    }
+
+    const c = confirm(
+      `Are you sure you want to delete the collection\n"${this.node.ref.path}"?`
+    );
+
+    if (!c) {
+      return;
+    }
+
+    await this.firebaseService.httpsCallable('deleteCollection', {
+      path: this.node.ref.path,
+    });
+
+    this.databaseService.path$.next(this.node.ref.parent?.path || '');
+  }
+
+  matchesCurrentPath(path: string): boolean {
+    return this.databaseService.path$.value.includes(path);
   }
 }

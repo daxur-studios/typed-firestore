@@ -43,6 +43,10 @@ import { FirebaseService } from '@app/services';
 export class ModifyDatabaseComponent implements OnInit, OnDestroy {
   @Input({ required: true }) node?: DatabaseNode;
   @Input({ required: true }) ref?: MatBottomSheetRef<any>;
+  @Input({ required: true }) intent?:
+    | 'addDocument'
+    | 'addCollection'
+    | 'addFields';
 
   public readonly group = new FormGroup({
     collectionId: new FormControl('', [Validators.required]),

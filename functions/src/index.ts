@@ -36,3 +36,18 @@ export const listCollections = onCall<{ path: string }>(
     return collections.map((collection) => collection.path);
   }
 );
+
+export const deleteCollection = onCall<{ path: string }>(
+  { region: baseRegion, cors: true },
+  async (request) => {
+    throwIfNoPermissionCallable(request, UserPermissionEnum.isAdmin);
+
+    await import('./api/callable/deleteCollection').then(
+      async ({ default: deleteCollection }) => {
+        return await deleteCollection(request.data.path);
+      }
+    );
+
+    return true;
+  }
+);
