@@ -30,6 +30,8 @@ import { DatabaseFieldTypeOptions } from '../database.model';
 import { DocumentNodeComponent } from '../document-node/document-node.component';
 import { ModifyDatabaseComponent } from '../modify-database/modify-database.component';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatChipsModule } from '@angular/material/chips';
 
 @Component({
   selector: 'app-database-node',
@@ -45,6 +47,8 @@ import { MatMenuModule } from '@angular/material/menu';
     MatTooltipModule,
     DocumentNodeComponent,
     MatMenuModule,
+    MatProgressBarModule,
+    MatChipsModule,
   ],
   templateUrl: './database-node.component.html',
   styleUrls: ['./database-node.component.scss'],
@@ -58,14 +62,13 @@ export class DatabaseNodeComponent implements OnInit, OnDestroy {
   public readonly DatabaseFieldTypeOptions = DatabaseFieldTypeOptions;
 
   public get isCollection(): boolean {
-    return this.node?.ref?.type === 'collection';
+    return this.node?.isCollection || false;
   }
   public get isDocument(): boolean {
-    return this.node?.ref?.type === 'document';
+    return this.node?.isDocument || false;
   }
-
   public get isRoot(): boolean {
-    return !this.node?.ref || this.node?.ref?.path === '';
+    return this.node?.isRoot || false;
   }
 
   intent: 'addCollection' | 'addDocument' | 'addFields' | undefined;
@@ -132,9 +135,9 @@ export class DatabaseNodeComponent implements OnInit, OnDestroy {
             : '';
 
         const data: { [key: string]: any } = {};
-        result.fields?.forEach((field) => {
-          if (field.field) {
-            data[field.field] = field.value;
+        result.fields?.forEach((fieldGroup) => {
+          if (fieldGroup.field) {
+            data[fieldGroup.field] = fieldGroup.value;
           }
         });
 
@@ -171,6 +174,43 @@ export class DatabaseNodeComponent implements OnInit, OnDestroy {
     });
 
     this.databaseService.path$.next(this.node.ref.parent?.path || '');
+  }
+
+  async deleteDocument() {
+    if (this.node?.ref?.type !== 'document' || !this.node?.ref?.path) {
+      throw new Error('Can only delete a document');
+    }
+
+    const c = confirm(
+      `Are you sure you want to delete the document\n"${this.node.ref.path}"?`
+    );
+
+    if (!c) {
+      return;
+    }
+
+    await this.firebaseService.firestoreDocDelete(this.node.ref.path);
+    this.databaseService.path$.next(this.node.ref.parent?.path || '');
+  }
+
+  async clearAllFields() {
+    if (this.node?.ref?.type !== 'document' || !this.node?.ref?.path) {
+      throw new Error('Can only clear fields on a document');
+    }
+
+    const c = confirm(
+      `Are you sure you want to clear the document\n"${this.node.ref.path}"?`
+    );
+
+    if (!c) {
+      return;
+    }
+
+    await this.firebaseService.firestoreDocSet(
+      this.node.ref.path!,
+      {},
+      { merge: false }
+    );
   }
 
   matchesCurrentPath(path: string): boolean {

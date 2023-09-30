@@ -13,7 +13,7 @@ service cloud.firestore {
     match /public/non-listables/{collection=**}{
     allow read:if true;
     allow write:if true;
-    allow list: if false;
+    allow list:if isAdmin();
     }
     match /private/user/{user_id}/{user_doc=**} {
       allow read, write: if isOwner(user_id);

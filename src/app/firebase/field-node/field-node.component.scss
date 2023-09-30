@@ -1,0 +1,55 @@
+:host {
+  display: contents;
+}
+.equals {
+  font-size: 1.8rem;
+  padding: 0.5ch;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.field-node {
+  flex: 1 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.string {
+  //color: rgba(255, 152, 0, 01);
+  background: rgba(255, 152, 0, 0.25);
+}
+.number {
+  //color: #00bcd4;
+  background: rgba(0, 188, 212, 0.25);
+}
+.boolean {
+  //color: #2196f3;
+  background: rgba(33, 150, 243, 0.25);
+}
+.map {
+  //color: #9c27b0;
+  background: rgba(156, 39, 176, 0.25);
+}
+.array {
+  //color: #f44336;
+  background: rgba(244, 67, 54, 0.25);
+}
+.null {
+  // color: #607d8b;
+  background: rgba(96, 125, 139, 0.25);
+}
+.timestamp {
+  // color: #4caf50;
+  background: rgba(76, 175, 80, 0.25);
+}
+.geopoint {
+  // color: #ff5722;
+  background: rgba(255, 87, 34, 0.25);
+}
+.reference {
+  //color: #795548;
+  background: rgba(121, 85, 72, 0.25);
+}

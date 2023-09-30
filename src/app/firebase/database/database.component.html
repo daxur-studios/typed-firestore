@@ -1,8 +1,9 @@
-<p>database works!</p>
-
 <div class="database-page">
   <p>
-    Database
+    Firestore Database -
+    <span class="project-id" style="opacity: 0.5">
+      {{ databaseService.config.projectId }}
+    </span>
     <button mat-icon-button (click)="openLoginSheet()">
       <mat-icon>login</mat-icon>
     </button>

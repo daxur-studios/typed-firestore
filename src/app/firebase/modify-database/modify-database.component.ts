@@ -20,9 +20,11 @@ import {
   DatabaseFormControls,
   DatabaseNode,
   DatabaseService,
+  ModifyDatabaseFormGroup,
 } from '@app/firebase/database.service';
 import { MatBottomSheetRef } from '@angular/material/bottom-sheet';
 import { FirebaseService } from '@app/services';
+import { FieldNodeComponent } from '../field-node/field-node.component';
 
 @Component({
   selector: 'app-modify-database',
@@ -36,6 +38,7 @@ import { FirebaseService } from '@app/services';
     MatInputModule,
     MatSelectModule,
     FormsModule,
+    FieldNodeComponent,
   ],
   templateUrl: './modify-database.component.html',
   styleUrls: ['./modify-database.component.scss'],
@@ -48,7 +51,7 @@ export class ModifyDatabaseComponent implements OnInit, OnDestroy {
     | 'addCollection'
     | 'addFields';
 
-  public readonly group = new FormGroup({
+  public readonly group: ModifyDatabaseFormGroup = new FormGroup({
     collectionId: new FormControl('', [Validators.required]),
     documentId: new FormControl('', [Validators.required]),
     fields: new FormArray<FormGroup<DatabaseFieldControls>>([]),
@@ -69,16 +72,20 @@ export class ModifyDatabaseComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     if (this.node?.ref) {
-      if (this.node.ref?.type === 'document') {
+      if (this.intent === 'addDocument') {
         this.group.patchValue({
           collectionId: this.node.ref.parent?.id || '',
-          documentId:
-            this.node?.ref?.id || this.firebaseService.firestoreGenerateId(),
-        });
-      } else if (this.node.ref?.type === 'collection') {
-        this.group.patchValue({
-          collectionId: this.node?.ref?.id || '',
           documentId: this.firebaseService.firestoreGenerateId(),
+        });
+      } else if (this.intent === 'addCollection') {
+        this.group.patchValue({
+          collectionId: '',
+          documentId: this.firebaseService.firestoreGenerateId(),
+        });
+      } else if (this.intent === 'addFields') {
+        this.group.patchValue({
+          collectionId: this.node.ref.parent?.id || '',
+          documentId: this.node?.ref?.id || '',
         });
       } else {
         // Root

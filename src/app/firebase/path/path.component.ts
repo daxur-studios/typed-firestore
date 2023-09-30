@@ -29,6 +29,7 @@ import {
 } from '@angular/fire/firestore';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatToolbarModule } from '@angular/material/toolbar';
 
 @Component({
   selector: 'app-path',
@@ -42,6 +43,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
     MatInputModule,
     ReactiveFormsModule,
     PathSegmentComponent,
+    MatToolbarModule,
   ],
   templateUrl: './path.component.html',
   styleUrls: ['./path.component.scss'],

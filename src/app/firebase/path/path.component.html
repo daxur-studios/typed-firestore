@@ -1,35 +1,32 @@
-<!--Path-->
-<span class="project-id" *ngIf="!group.controls.path.enabled">
-  {{ databaseService.config.projectId }}
-</span>
+<mat-toolbar>
+  <button
+    mat-icon-button
+    (click)="databaseService.path$.next('')"
+    *ngIf="!group.controls.path.enabled"
+  >
+    <mat-icon>home</mat-icon>
+  </button>
 
-<button
-  mat-icon-button
-  (click)="databaseService.path$.next('')"
-  *ngIf="!group.controls.path.enabled"
->
-  <mat-icon>home</mat-icon>
-</button>
+  <div
+    *ngIf="!group.controls.path.enabled"
+    class="path-segments"
+    style="display: inline-flex"
+  >
+    <app-path-segment *ngFor="let ref of refs" [ref]="ref"></app-path-segment>
+  </div>
 
-<div
-  *ngIf="!group.controls.path.enabled"
-  class="path-segments"
-  style="display: inline-flex"
->
-  <app-path-segment *ngFor="let ref of refs" [ref]="ref"></app-path-segment>
-</div>
+  <mat-form-field *ngIf="group.controls.path.enabled" style="flex: 1 1">
+    <input
+      type="text"
+      matInput
+      [formControl]="group.controls.path"
+      (keypress)="onKeyPress($event, pathInput)"
+      type="search"
+      #pathInput
+    />
+  </mat-form-field>
 
-<mat-form-field *ngIf="group.controls.path.enabled" style="flex: 1 1">
-  <input
-    type="text"
-    matInput
-    [formControl]="group.controls.path"
-    (keypress)="onKeyPress($event, pathInput)"
-    type="search"
-    #pathInput
-  />
-</mat-form-field>
-
-<button mat-icon-button (click)="editPath()">
-  <mat-icon>edit</mat-icon>
-</button>
+  <button mat-icon-button (click)="editPath()">
+    <mat-icon>edit</mat-icon>
+  </button>
+</mat-toolbar>

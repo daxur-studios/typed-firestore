@@ -12,6 +12,7 @@ import { DatabaseComponent } from './firebase/database/database.component';
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
+  host: { class: 'flex-page' },
 })
 export class AppComponent {
   title = 'bruno-kertesz';

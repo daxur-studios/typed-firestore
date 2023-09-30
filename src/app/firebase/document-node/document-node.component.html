@@ -1,20 +1,17 @@
-<p>document-node works!</p>
-
-<button mat-icon-button [matMenuTriggerFor]="menu">
-  <mat-icon>more_vert</mat-icon>
-</button>
-
-<!--Menu-->
-<mat-menu #menu="matMenu">
-  <button mat-menu-item color="warn" (click)="clearAllFields()">
-    <mat-icon>clear</mat-icon>
-    <span>Clear all fields</span>
-  </button>
-  <button mat-menu-item color="warn" (click)="deleteDocument()">
-    <mat-icon>delete</mat-icon>
-    <span>Delete Document</span>
-  </button>
-</mat-menu>
+<!--Form Array-->
+<div formArrayName="fields">
+  <div
+    *ngFor="let field of group.controls.fields.controls; let i = index"
+    style="display: flex; align-items: center; gap: 2px"
+  >
+    <app-field-node
+      [parent]="group"
+      [field]="field"
+      [index]="i"
+      [mode]="'view'"
+    />
+  </div>
+</div>
 
 <pre>
     {{ data$ | async | json }}

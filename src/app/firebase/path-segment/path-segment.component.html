@@ -1,1 +1,6 @@
-<div class="path-segment" (click)="goTo(ref)">/{{ ref.id || "Root" }}</div>
+<div style="display: flex; align-items: center; justify-content: center">
+  <mat-icon>keyboard_arrow_right</mat-icon>
+  <mat-chip class="path-segment" (click)="goTo(ref)">
+    {{ ref.id || "Root" }}
+  </mat-chip>
+</div>

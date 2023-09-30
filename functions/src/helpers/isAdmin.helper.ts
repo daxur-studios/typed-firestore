@@ -1,7 +1,7 @@
 import * as functions from 'firebase-functions';
 import { projectDomain } from '../config';
 import { Request } from '../models/request.model';
-import { UserPermissionEnum } from '../permissions.model';
+import { UserPermissionEnum } from '../models/permissions.model';
 import { FirebaseServices } from '../services/firebase.service';
 import { hasDocumentChanged } from './hasChanged.helper';
 import { HasChangedParams } from './hasChanged.helper';

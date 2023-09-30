@@ -1,17 +1,32 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BehaviorSubject, Subject, of, switchMap, takeUntil } from 'rxjs';
-import { DatabaseNode, DatabaseService } from '../database.service';
+import {
+  DatabaseFieldControls,
+  DatabaseFieldType,
+  DatabaseNode,
+  DatabaseService,
+  ModifyDatabaseFormGroup,
+  getDatabaseFieldType,
+} from '../database.service';
 import { DocumentData } from '@angular/fire/firestore';
 import { FirebaseService } from '@app/services';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
+import { FieldNodeComponent } from '../field-node/field-node.component';
+import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-document-node',
   standalone: true,
-  imports: [CommonModule, MatIconModule, MatButtonModule, MatMenuModule],
+  imports: [
+    CommonModule,
+    MatIconModule,
+    MatButtonModule,
+    MatMenuModule,
+    FieldNodeComponent,
+  ],
   templateUrl: './document-node.component.html',
   styleUrls: ['./document-node.component.scss'],
 })
@@ -22,6 +37,17 @@ export class DocumentNodeComponent implements OnInit, OnDestroy {
 
   public readonly data$ = new BehaviorSubject<DocumentData>({});
 
+  public readonly group: ModifyDatabaseFormGroup = new FormGroup({
+    collectionId: new FormControl('', [Validators.required]),
+    documentId: new FormControl('', [Validators.required]),
+    fields: new FormArray<FormGroup<DatabaseFieldControls>>([]),
+  });
+
+  public get fields() {
+    return this.group.controls.fields;
+  }
+  private readonly _field = this.group.controls.fields.controls[0];
+
   constructor(
     public databaseService: DatabaseService,
     public firebaseService: FirebaseService
@@ -30,18 +56,6 @@ export class DocumentNodeComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     console.debug('DocumentNodeComponent.ngOnInit 🚀', this);
 
-    // this.databaseService.path$
-    //   .pipe(
-    //     takeUntil(this.destroy),
-    //     switchMap((path) => {
-    //       const validation = this.firebaseService.validReferenceFromPath(path);
-    //       if (validation.isDocumentPath) {
-    //         return this.firebaseService.firestoreDocValueChanges(path);
-    //       } else {
-    //         return of({} as DocumentData);
-    //       }
-    //     })
-    //   )
     if (!this.node?.ref?.path) {
       throw new Error('DocumentNodeComponent: node.ref.path is required');
     }
@@ -51,6 +65,8 @@ export class DocumentNodeComponent implements OnInit, OnDestroy {
       .subscribe((data) => {
         console.debug('DocumentNodeComponent.path$', data);
         this.data$.next(data || {});
+
+        this.updateForm();
       });
   }
 
@@ -61,16 +77,39 @@ export class DocumentNodeComponent implements OnInit, OnDestroy {
     this.destroy.complete();
   }
 
-  async clearAllFields() {
-    if (this.node?.ref?.type !== 'document' || !this.node?.ref?.path) {
-      throw new Error('Can only clear fields on a document');
+  private updateForm() {
+    if (!this.node?.ref?.parent?.id || !this.node?.ref?.id) {
+      throw new Error(
+        'DocumentNodeComponent: node.ref.parent.id and node.ref.id are required'
+      );
     }
 
-    await this.firebaseService.firestoreDocSet(
-      this.node.ref.path!,
-      {},
-      { merge: false }
-    );
+    this.group.patchValue({
+      collectionId: this.node?.ref.parent?.id || '',
+      documentId: this.node?.ref.id || '',
+    });
+
+    this.fields.clear();
+    Object.entries(this.data$.value).forEach(([key, value]) => {
+      this.addField({
+        field: key,
+        value: value,
+        type: getDatabaseFieldType(value),
+      });
+    });
+  }
+
+  addField(
+    params?: Partial<typeof DocumentNodeComponent.prototype._field.value>
+  ): void {
+    const group: FormGroup<DatabaseFieldControls> =
+      new FormGroup<DatabaseFieldControls>({
+        field: new FormControl(params?.field || '', [Validators.required]),
+        type: new FormControl(params?.type || DatabaseFieldType.String),
+        value: new FormControl(params?.value || ''),
+      });
+
+    this.fields.push(group);
   }
 
   async deleteDocument() {

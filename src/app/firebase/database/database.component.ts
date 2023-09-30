@@ -37,32 +37,13 @@ import { DatabaseNodeComponent } from '../database-node/database-node.component'
 export class DatabaseComponent {
   private readonly destroy$ = new Subject<void>();
 
-  public get nodes(): DatabaseNode[] {
-    const nodes: DatabaseNode[] = [];
-
-    const currentPath = this.databaseService.path$.value;
-
-    const x: DatabaseNode | undefined =
-      this.databaseService.database[currentPath];
-    const y: DatabaseNode | undefined =
-      this.databaseService.database?.[x?.ref?.parent?.path!];
-    const z: DatabaseNode | undefined =
-      this.databaseService.database?.[y?.ref?.parent?.path!];
-
-    if (x) {
-      return [z, y, x].filter((n) => !!n);
-    }
-
-    return [];
-  }
+  public nodes: DatabaseNode[] = [];
 
   constructor(
     public readonly firebaseService: FirebaseService,
     public readonly databaseService: DatabaseService,
     private readonly matBottomSheet: MatBottomSheet
   ) {
-    // this.x = this.y;
-
     this.firebaseService.authState$
       .pipe(takeUntil(this.destroy$))
       .subscribe((user) => {
@@ -71,6 +52,10 @@ export class DatabaseComponent {
           const ref = matBottomSheet.open(LoginComponent, config);
         }
       });
+
+    this.firebaseService.authPromise.then((user) => {
+      this.initOnPathChange();
+    });
   }
 
   ngOnDestroy(): void {
@@ -83,5 +68,27 @@ export class DatabaseComponent {
   openLoginSheet() {
     const config: MatBottomSheetConfig<LoginComponent> = {};
     this.matBottomSheet.open(LoginComponent, config);
+  }
+
+  private initOnPathChange() {
+    this.databaseService.path$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((currentPath) => {
+        const cacheView = this.databaseService.cacheView;
+
+        const ref1 = this.databaseService.cacheView[currentPath];
+
+        const currentNode: DatabaseNode | undefined = ref1;
+
+        if (currentNode) {
+          /** Create the parent nodes, in case they aren't present in the cacheView */
+        }
+
+        const y: DatabaseNode | undefined =
+          cacheView?.[currentNode?.ref?.parent?.path!];
+        const z: DatabaseNode | undefined = cacheView?.[y?.ref?.parent?.path!];
+
+        this.nodes = [z, y, currentNode].filter((n) => !!n);
+      });
   }
 }

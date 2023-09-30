@@ -5,11 +5,13 @@ import {
   DocumentReference,
 } from '@angular/fire/firestore';
 import { DatabaseService } from '../database.service';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-path-segment',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, MatChipsModule, MatIconModule],
   templateUrl: './path-segment.component.html',
   styleUrls: ['./path-segment.component.scss'],
 })

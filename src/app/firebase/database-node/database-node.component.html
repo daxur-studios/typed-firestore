@@ -1,5 +1,12 @@
 <div style="flex: 1 1" class="node-segment">
   <div class="header">
+    <mat-progress-bar
+      style="position: absolute; bottom: 0px"
+      *ngIf="node?.isLoading()"
+      mode="indeterminate"
+      color="primary"
+    ></mat-progress-bar>
+
     <!--ROOT-->
     <ng-container *ngIf="isRoot">
       <mat-icon svgIcon="firestore" matTooltip="Root"></mat-icon> Root
@@ -7,66 +14,127 @@
 
     <!--DOCUMENT-->
     <ng-container *ngIf="isDocument">
-      <mat-icon matTooltip="Document"> description </mat-icon>
-      {{ node?.ref?.id }}
+      <mat-chip>
+        <mat-icon matTooltip="Document" matChipRemove>data_object</mat-icon>
+        {{ node?.ref?.id }}
+      </mat-chip>
     </ng-container>
 
     <!--COLLECTION-->
     <ng-container *ngIf="isCollection">
-      <mat-icon matTooltip="Collection">category</mat-icon>
-      {{ node?.ref?.id }}
+      <mat-chip>
+        <mat-icon matTooltip="Collection" matChipRemove>list</mat-icon>
+        {{ node?.ref?.id }}
+      </mat-chip>
     </ng-container>
 
-    <div style="float: right; align-self: end">
-      <button mat-icon-button [matMenuTriggerFor]="menu">
-        <mat-icon>more_vert</mat-icon>
-      </button>
-    </div>
+    <button mat-icon-button [matMenuTriggerFor]="menu">
+      <mat-icon>more_vert</mat-icon>
+    </button>
 
     <!--Menu-->
     <mat-menu #menu="matMenu">
-      <button mat-menu-item color="warn" (click)="deleteCollection()">
+      <button
+        *ngIf="isCollection"
+        mat-menu-item
+        color="warn"
+        (click)="deleteCollection()"
+      >
         <mat-icon>delete</mat-icon>
         <span>Delete Collection</span>
+      </button>
+      <button
+        *ngIf="isDocument"
+        mat-menu-item
+        color="warn"
+        (click)="deleteDocument()"
+      >
+        <mat-icon>delete</mat-icon>
+        <span>Delete Document</span>
+      </button>
+      <button
+        *ngIf="isDocument"
+        mat-menu-item
+        color="warn"
+        (click)="clearAllFields()"
+      >
+        <mat-icon>clear</mat-icon>
+        <span>Clear all fields</span>
       </button>
     </mat-menu>
   </div>
 
   <!--Node Children (Documents or Collections)-->
   <div class="children">
-    <div class="add">
-      <button
-        mat-button
-        (click)="
-          modifyDatabase(isDocument || isRoot ? 'addCollection' : 'addDocument')
-        "
-        color="primary"
-      >
-        <mat-icon>add</mat-icon>
-        {{ isDocument || isRoot ? "Start Collection" : "Add Document" }}
-      </button>
-    </div>
-
     <mat-list>
-      <ng-container *ngFor="let child of node?.children">
-        <mat-selection-list [multiple]="false" (click)="goTo(child)">
-          <mat-list-option
-            checkboxPosition="before"
-            [value]="child.path"
-            [selected]="matchesCurrentPath(child.path)"
-          >
-            {{ child.id }}
-          </mat-list-option>
-        </mat-selection-list>
-        <mat-divider></mat-divider>
-      </ng-container>
+      <mat-list-item>
+        <button
+          mat-button
+          (click)="
+            modifyDatabase(
+              isDocument || isRoot ? 'addCollection' : 'addDocument'
+            )
+          "
+          color="primary"
+        >
+          <mat-icon>add</mat-icon>
+          {{ isDocument || isRoot ? "Start Collection" : "Add Document" }}
+        </button>
+      </mat-list-item>
     </mat-list>
+
+    <ng-container *ngFor="let child of node?.children">
+      <mat-selection-list
+        [multiple]="false"
+        (click)="goTo(child)"
+        hideSingleSelectionIndicator="true"
+      >
+        <mat-list-option
+          checkboxPosition="before"
+          [value]="child.path"
+          [selected]="matchesCurrentPath(child.path)"
+        >
+          <mat-icon matListItemIcon>
+            {{ isCollection ? "data_object" : "list" }}
+          </mat-icon>
+          {{ child.id }}
+        </mat-list-option>
+      </mat-selection-list>
+      <mat-divider></mat-divider>
+    </ng-container>
   </div>
 
   <div class="add-field" *ngIf="isDocument && !isRoot">
-    <button mat-button (click)="modifyDatabase('addFields')" color="primary">
-      <mat-icon>add</mat-icon> Add Field
-    </button>
+    <mat-divider></mat-divider>
+    <mat-list>
+      <mat-list-item>
+        <button
+          mat-button
+          (click)="modifyDatabase('addFields')"
+          color="primary"
+        >
+          <mat-icon>add</mat-icon> Add Field
+        </button>
+
+        <div matListItemMeta>
+          <button mat-icon-button [matMenuTriggerFor]="menu">
+            <mat-icon>more_vert</mat-icon>
+          </button>
+
+          <!--Menu-->
+          <mat-menu #menu="matMenu">
+            <button mat-menu-item color="warn" (click)="clearAllFields()">
+              <mat-icon>clear</mat-icon>
+              <span>Clear all fields</span>
+            </button>
+            <button mat-menu-item color="warn" (click)="deleteDocument()">
+              <mat-icon>delete</mat-icon>
+              <span>Delete Document</span>
+            </button>
+          </mat-menu>
+        </div>
+      </mat-list-item>
+    </mat-list>
   </div>
 
   <app-document-node

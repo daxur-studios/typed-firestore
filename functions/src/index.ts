@@ -9,9 +9,10 @@
 
 import * as logger from 'firebase-functions/logger';
 import { onCall, onRequest } from 'firebase-functions/v2/https';
+import { onDocumentWritten } from 'firebase-functions/v2/firestore';
 import { baseRegion } from './config';
 import { throwIfNoPermissionCallable } from './helpers';
-import { UserPermissionEnum } from './permissions.model';
+import { UserPermissionEnum } from './models/permissions.model';
 
 export const helloWorld = onRequest(
   { region: baseRegion },
@@ -42,12 +43,24 @@ export const deleteCollection = onCall<{ path: string }>(
   async (request) => {
     throwIfNoPermissionCallable(request, UserPermissionEnum.isAdmin);
 
-    await import('./api/callable/deleteCollection').then(
+    return await import('./api/callable/deleteCollection').then(
       async ({ default: deleteCollection }) => {
         return await deleteCollection(request.data.path);
       }
     );
-
-    return true;
   }
 );
+
+//#region USER PERMISSIONS
+
+export const ManageUserPermissions = onDocumentWritten(
+  { document: 'private/auth/permissions/{uid}', region: baseRegion },
+  async (change) => {
+    return await import(
+      './api/firestore/onWrite.private.auth.permissions.{uid}'
+    ).then(async ({ default: ManageUserPermissions }) => {
+      return await ManageUserPermissions(change);
+    });
+  }
+);
+//#endregion
