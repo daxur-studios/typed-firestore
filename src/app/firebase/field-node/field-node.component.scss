@@ -17,6 +17,7 @@
   justify-content: center;
 }
 
+//#region Colors
 .string {
   //color: rgba(255, 152, 0, 01);
   background: rgba(255, 152, 0, 0.25);
@@ -52,4 +53,10 @@
 .reference {
   //color: #795548;
   background: rgba(121, 85, 72, 0.25);
+}
+
+//#endregion
+
+.view-only-field-type {
+  opacity: 0.5;
 }

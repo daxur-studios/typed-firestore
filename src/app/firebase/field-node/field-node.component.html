@@ -1,3 +1,4 @@
+<!--MODE EDIT-->
 <ng-container *ngIf="!mode || mode === 'edit'">
   <!--Field-->
   <mat-form-field>
@@ -8,6 +9,7 @@
     =
     <div style="height: 22px; width: 1px"></div>
   </div>
+
   <!--Type-->
 
   <mat-form-field>
@@ -140,3 +142,73 @@
     <mat-icon>remove_circle_outline</mat-icon>
   </button>
 </ng-container>
+
+<!--MODE VIEW-->
+<ng-container *ngIf="mode === 'view'">
+  <mat-list-item checkboxPosition="after">
+    <!--Field-->
+    <span matListItemTitle
+      >{{ field.controls.field.value }}:
+
+      <!--NG Switch Based on Type-->
+      <ng-container [ngSwitch]="field.controls.type.value">
+        <!--String-->
+        <span *ngSwitchCase="'string'">
+          {{ field.controls.value.value }}
+        </span>
+        <!--Number-->
+        <span *ngSwitchCase="'number'">
+          {{ field.controls.value.value }}
+        </span>
+        <!--Boolean-->
+        <span *ngSwitchCase="'boolean'">
+          {{ field.controls.value.value }}
+        </span>
+        <!--Map-->
+        <span *ngSwitchCase="'map'">
+          {{ field.controls.value.value | json }}
+        </span>
+        <!--Array-->
+        <span *ngSwitchCase="'array'">
+          {{ field.controls.value.value | json }}
+        </span>
+        <!--Null-->
+        <span *ngSwitchCase="'null'">
+          {{ field.controls.type.value }}
+        </span>
+        <!--Timestamp-->
+        <span *ngSwitchCase="'timestamp'">
+          {{ field.controls.value.value }}
+        </span>
+        <!--Geopoint-->
+        <span *ngSwitchCase="'geopoint'">
+          {{ field.controls.value.value }}
+        </span>
+        <!--Reference-->
+        <span *ngSwitchCase="'reference'">
+          {{ field.controls.value.value }}
+        </span>
+      </ng-container>
+    </span>
+    <!--Value-->
+
+    <div matListItemMeta>
+      <span class="view-only-field-type">
+        ({{ field.controls.type.value }})
+      </span>
+    </div>
+
+    <div matListItemIcon>
+      <button mat-icon-button (click)="editField()">
+        <mat-icon>edit</mat-icon>
+      </button>
+
+      <button mat-icon-button (click)="deleteField()">
+        <mat-icon>delete</mat-icon>
+      </button>
+    </div>
+  </mat-list-item>
+</ng-container>
+
+<ng-template #arrayTemplate></ng-template>
+<ng-template #mapTemplate></ng-template>

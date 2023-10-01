@@ -216,4 +216,9 @@ export class DatabaseNodeComponent implements OnInit, OnDestroy {
   matchesCurrentPath(path: string): boolean {
     return this.databaseService.path$.value.includes(path);
   }
+
+  fieldMode: 'view' | 'edit' = 'view';
+  setFieldMode() {
+    this.fieldMode = this.fieldMode === 'view' ? 'edit' : 'view';
+  }
 }

@@ -116,6 +116,10 @@
           <mat-icon>add</mat-icon> Add Field
         </button>
 
+        <button mat-button (click)="setFieldMode()" color="primary">
+          <mat-icon>edit</mat-icon> Edit Fields
+        </button>
+
         <div matListItemMeta>
           <button mat-icon-button [matMenuTriggerFor]="menu">
             <mat-icon>more_vert</mat-icon>
@@ -140,6 +144,7 @@
   <app-document-node
     *ngIf="isDocument && !isRoot"
     [node]="node"
+    [mode]="fieldMode"
   ></app-document-node>
 </div>
 

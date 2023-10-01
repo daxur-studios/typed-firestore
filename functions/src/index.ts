@@ -8,8 +8,13 @@
  */
 
 import * as logger from 'firebase-functions/logger';
+import * as functions from 'firebase-functions';
 import { onCall, onRequest } from 'firebase-functions/v2/https';
 import { onDocumentWritten } from 'firebase-functions/v2/firestore';
+import {
+  beforeUserCreated,
+  beforeUserSignedIn,
+} from 'firebase-functions/v2/identity';
 import { baseRegion } from './config';
 import { throwIfNoPermissionCallable } from './helpers';
 import { UserPermissionEnum } from './models/permissions.model';
@@ -63,4 +68,50 @@ export const ManageUserPermissions = onDocumentWritten(
     });
   }
 );
+//#endregion
+
+//#region USER BLOCKING FUNCTIONS
+
+export const beforeCreated = beforeUserCreated(
+  { region: baseRegion },
+  async (event) => {
+    const x = import('./api/identity/beforeUserCreated').then(
+      async ({ default: beforeUserCreated }) => {
+        return beforeUserCreated(event);
+      }
+    );
+
+    return await x;
+  }
+);
+
+export const beforeSignedIn = beforeUserSignedIn(
+  { region: baseRegion },
+  async (event) => {
+    const x = import('./api/identity/beforeUserSignedIn').then(
+      async ({ default: beforeUserSignedIn }) => {
+        return beforeUserSignedIn(event);
+      }
+    );
+
+    return await x;
+  }
+);
+
+/** Responds to the creation of a Firebase Auth user. */
+export const UserOnCreate = functions
+  .region(baseRegion)
+  .auth.user()
+  .onCreate(async (user) => {
+    await (await import('./api/auth/user.OnCreate')).default(user);
+  });
+
+/** Responds to the deletion of a Firebase Auth user. */
+export const auth_onDelete = functions
+  .region(baseRegion)
+  .auth.user()
+  .onDelete(async (user) => {
+    await (await import('./api/auth/user.OnDelete')).default(user);
+  });
+
 //#endregion

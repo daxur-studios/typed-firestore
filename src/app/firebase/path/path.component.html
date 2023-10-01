@@ -1,32 +1,35 @@
 <mat-toolbar>
-  <button
-    mat-icon-button
-    (click)="databaseService.path$.next('')"
-    *ngIf="!group.controls.path.enabled"
-  >
-    <mat-icon>home</mat-icon>
-  </button>
+  <div style="flex: 1 1">
+    <button
+      mat-icon-button
+      (click)="databaseService.path$.next('')"
+      *ngIf="!group.controls.path.enabled"
+    >
+      <mat-icon>home</mat-icon>
+    </button>
 
-  <div
-    *ngIf="!group.controls.path.enabled"
-    class="path-segments"
-    style="display: inline-flex"
-  >
-    <app-path-segment *ngFor="let ref of refs" [ref]="ref"></app-path-segment>
+    <div
+      *ngIf="!group.controls.path.enabled"
+      class="path-segments"
+      style="display: inline-flex"
+    >
+      <app-path-segment *ngFor="let ref of refs" [ref]="ref"></app-path-segment>
+    </div>
+
+    <mat-form-field *ngIf="group.controls.path.enabled" style="flex: 1 1">
+      <input
+        type="text"
+        matInput
+        [formControl]="group.controls.path"
+        (keypress)="onKeyPress($event, pathInput)"
+        type="search"
+        #pathInput
+      />
+    </mat-form-field>
+
+    <button mat-icon-button (click)="editPath()">
+      <mat-icon>edit</mat-icon>
+    </button>
   </div>
-
-  <mat-form-field *ngIf="group.controls.path.enabled" style="flex: 1 1">
-    <input
-      type="text"
-      matInput
-      [formControl]="group.controls.path"
-      (keypress)="onKeyPress($event, pathInput)"
-      type="search"
-      #pathInput
-    />
-  </mat-form-field>
-
-  <button mat-icon-button (click)="editPath()">
-    <mat-icon>edit</mat-icon>
-  </button>
+  <ng-content></ng-content>
 </mat-toolbar>

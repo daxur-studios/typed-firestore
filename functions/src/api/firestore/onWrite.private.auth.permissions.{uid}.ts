@@ -23,6 +23,11 @@ async function ManageUserPermissions(
   >
 ) {
   const auth = await FirebaseServices.getAuth();
+  const firestore = await FirebaseServices.getFirestore();
+
+  await firestore.doc('private/auth').set({
+    userPermissionsModified: new Date(),
+  });
 
   const cloudEvent = change.data;
 

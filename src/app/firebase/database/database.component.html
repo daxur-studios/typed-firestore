@@ -1,15 +1,16 @@
 <div class="database-page">
-  <p>
+  <div>
     Firestore Database -
     <span class="project-id" style="opacity: 0.5">
       {{ databaseService.config.projectId }}
     </span>
+  </div>
+
+  <app-path>
     <button mat-icon-button (click)="openLoginSheet()">
       <mat-icon>login</mat-icon>
     </button>
-  </p>
-
-  <app-path></app-path>
+  </app-path>
   <div style="display: flex">
     <app-database-node
       *ngFor="let node of nodes"

@@ -18,6 +18,7 @@ import {
 } from '@angular/material/slide-toggle';
 import { Subject, distinctUntilChanged, takeUntil } from 'rxjs';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatListModule } from '@angular/material/list';
 
 @Component({
   selector: 'app-field-node',
@@ -33,6 +34,7 @@ import { MatChipsModule } from '@angular/material/chips';
     MatFormFieldModule,
     MatInputModule,
     MatChipsModule,
+    MatListModule,
     MatSlideToggleModule,
   ],
   templateUrl: './field-node.component.html',
@@ -112,5 +114,10 @@ export class FieldNodeComponent implements OnInit, OnDestroy {
 
   removeField(index: number): void {
     this.fields.removeAt(index);
+  }
+
+  editField() {}
+  deleteField() {
+    this.fields.removeAt(this.index);
   }
 }

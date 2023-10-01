@@ -32,6 +32,7 @@ import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 })
 export class DocumentNodeComponent implements OnInit, OnDestroy {
   @Input({ required: true }) node!: DatabaseNode | undefined;
+  @Input() mode?: 'edit' | 'view' = 'view';
 
   private readonly destroy = new Subject<void>();
 
